@@ -124,26 +124,56 @@ def platform_price(order_id):
     return max(platform_discount_list)
 
 
-# 油站活动，满减或每升直降
+# 油站活动，满减且每升直降  注意，如果是每升直降，则会影响加油升数，在优惠中不会再叠加了，
+# 而满减，则是直接从加油金额中减去
 def site_price(order_id):
     s = 'select * from pit_oil_site_activity ' \
         'where site_id=' + str(site_id) + ' and product_type_id=' + str(product_type_id) + \
-        ' and start_time>=\'' + str(create_time) + '\' and end_time<=\'' + str(create_time) + '\''
+        ' and start_time<=\'' + str(create_time) + '\' and end_time>=\'' + str(create_time) + '\''
     list = ms.ExecQuery(s)
     tmp_list = [0]
 
     for i in list:
-        # discount_money_per_litre
+        # discount_money_per_litre 验证加油升数是否正确
         if (i[7] == 1):
-            site_money = i[9] * org_oil_litre
-            tmp_list.append(site_money)
-
+            org_oil_litre_site=org_amt/(org_price-i[9])
+            if(org_oil_litre-org_oil_litre_site<0.0001):
+                print('加油升数正常')
+            else:
+                print(org_oil_litre_site,'org_oil_litre_site')
+                print(org_oil_litre_site,'org_oil_litre_site')
+                exit('加油升数异常')
         # discount_fullcut
         elif (org_amt >= i[10]):
             site_money = i[11]
             tmp_list.append(site_money)
 
     return max(tmp_list)
+
+
+def member_marketing(province_id,city_id,district_id):
+    s='select * from  pit_oil_platform_activity where product_type_ids='+str(product_type_id)+\
+      ' and start_time<='+str(create_time)+' and end_time>='+str(create_time) +\
+      ' and limit_min_spend_money<='+str(org_amt)
+    list=ms.ExecQuery(s)
+    tmp_list=[]
+    for i in list:
+        if(len(i[14])!=0 ):
+            if(province_id not in i[14]):
+                continue
+            elif(len(i[15]!=0)):
+                if(city_id not in i[15]):
+                    continue
+                elif(len(i[17])!=0):
+                    if(district_id not in i[17]):
+                        continue
+        #1立减 2折扣(如9.5折)
+        if(i[6]==1):
+            tmp_list.append(i[9])
+        else:
+            money=
+
+
 
 
 def order_detail(col):
@@ -161,70 +191,37 @@ def com_select(table,col):
         tmp_list.append(i[0])
     return tmp_list
 
+def site_detail(col,site_id):
+    s = 'select ' + col + ' from pit_drp_site where id=' + str(site_id)
+    list = ms.ExecQuery(s)
+    return list[0][0]
+
+
 if __name__ == '__main__':
-    tmp_order0 = [18822532,
-                  18822531,
-                  18822530,
-                  18822529,
-                  18822528,
-                  18822527,
-                  18822526,
-                  18822525,
-                  18822524,
-                  18822523,
-                  18822522,
-                  18822521,
-                  18822520,
-                  18822519,
-                  18822518,
-                  18822517,
-                  18822516,
-                  18822515,
-                  18822514,
-                  18822513,
-                  18822512,
-                  18822511,
-                  18822510,
-                  18822509,
-                  18822508,
-                  18822507,
-                  18822506,
-                  18822505,
-                  18822504,
-                  18822503,
-                  18822502,
-                  18822501,
-                  18822500,
-                  18822499,
-                  18822498,
-                  18822497,
-                  18822496,
-                  18822495,
-                  18822494,
-                  18822493,
-                  18822492,
-                  18822491,
-                  18822490,
-                  18822489,
-                  18822488,
-                  18822487,
-                  18822486,
-                  18822485]
-    tmp_order1 = com_select('pit_oil_order','id')
+    tmp_order0 = [18822826]
+    # tmp_order1 = com_select('pit_oil_order','id')
 
 
     tmp_list = []
-    for order_id in tmp_order1:
+    for order_id in tmp_order0:
+        #order
         org_price = order_detail('org_price')
         org_oil_litre = order_detail('org_oil_litre')
         site_id = order_detail('site_id')
         product_type_id = order_detail('product_type_id')
         org_amt = order_detail('org_amt')
 
+        #site
+        province_id=site_detail('province_id',site_id)
+        city_id=site_detail('city_id',site_id)
+        district_id=site_detail('district_id',site_id)
+
+
         # 修改字符，去掉多余的时间字符
         create_time = str( order_detail('create_time')).split('.')[0]
-
-        tmp_list.append(site_price(order_id))
+        dic_reduce={}
+        dic_reduce['site']=site_price(order_id)
+        dic_reduce['platform']=platform_price(order_id)
+        tmp_list.append(dic_reduce)
     print('---------------------------------------')
     print(tmp_list)
-    print(max(tmp_list))
