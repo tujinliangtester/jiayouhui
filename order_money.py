@@ -156,7 +156,6 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
         ' \'and limit_min_spend_money<=' + str(org_amt)
     list = ms.ExecQuery(s)
     tmp_list = [0]
-
     # 如果有多个会员活动，取优惠最大
     for i in list:
         # 验证用户标签
@@ -174,15 +173,19 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
                 j += 1
         if (flag == 1): continue
         #省市区
+        
         if (i[14] != 0):
-            if (province_id != i[14]):
+            if (str(province_id) != i[14]):
                 continue
-            elif (i[15] != 0):
-                if (city_id not in i[15]):
+            elif (i[15] != '0'):
+                city_id_tmp='"'+str(city_id)+'"'
+                if (i[15].find(city_id_tmp)<0 and i[15].find(str(city_id))<0):
                     continue
-                elif (i[17]!= 0):
-                    if (district_id not in i[17]):
+                elif (i[17]!= '0'):
+                    district_id_tmp='"'+str(district_id)+'"'
+                    if (i[17].find(district_id_tmp)<0 and i[17].find(str(district_id))):
                         continue
+        print('省市区满足')
         # 1立减 2折扣(如9.5折)
         if (i[6] == 1):
             tmp_list.append(i[9])
@@ -243,7 +246,7 @@ if __name__ == '__main__':
     tmp_order1 = com_select('pit_oil_order', 'id')
 
     tmp_list = []
-    for order_id in tmp_order1:
+    for order_id in tmp_order0:
         # order
         org_price = order_detail('org_price')
         org_oil_litre = order_detail('org_oil_litre')
