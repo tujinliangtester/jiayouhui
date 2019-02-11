@@ -53,7 +53,7 @@ def platform_price(order_id):
         s = 'select * from pit_oil_platform_price ' \
             'where district_id=' + str(site[0][1]) + ' and city_id= ' + str(site[0][2]) + ' and province_id=' + str(
             site[0][3]) + \
-            ' and product_type_id=' + str(product_type_id) + ' and status=1'
+            ' and product_type_id=' + str(product_type_id) + ' and status=1 and site_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 4.省市区+油分类
@@ -61,7 +61,7 @@ def platform_price(order_id):
         s = 'select * from pit_oil_platform_price ' \
             'where district_id=' + str(site[0][1]) + ' and city_id= ' + str(site[0][2]) + ' and province_id=' + str(
             site[0][3]) + \
-            ' and product_category=' + str(product_category) + ' and status=1'
+            ' and product_category=' + str(product_category) + ' and status=1 and site_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 5.
@@ -69,7 +69,7 @@ def platform_price(order_id):
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
             'where city_id= ' + str(site[0][2]) + ' and province_id=' + str(site[0][3]) + \
-            ' and product_type_id=' + str(product_type_id) + ' and status=1'
+            ' and product_type_id=' + str(product_type_id) + ' and status=1 and site_id=0 and district_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 6.
@@ -77,7 +77,7 @@ def platform_price(order_id):
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
             'where city_id= ' + str(site[0][2]) + ' and province_id=' + str(site[0][3]) + \
-            ' and product_category=' + str(product_category) + ' and status=1'
+            ' and product_category=' + str(product_category) + ' and status=1 and site_id=0 and district_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 7.
@@ -85,7 +85,8 @@ def platform_price(order_id):
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
             'where  province_id=' + str(site[0][3]) + \
-            ' and product_type_id=' + str(product_type_id) + ' and status=1'
+            ' and product_type_id=' + str(
+            product_type_id) + ' and status=1 and site_id=0 and district_id=0 and city_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 8.
@@ -93,7 +94,8 @@ def platform_price(order_id):
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
             'where  province_id=' + str(site[0][3]) + \
-            ' and product_category=' + str(product_category) + ' and status=1'
+            ' and product_category=' + str(
+            product_category) + ' and status=1 and site_id=0 and district_id=0 and city_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 9.
@@ -101,17 +103,19 @@ def platform_price(order_id):
 
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
-            'where  product_type_id=' + str(product_type_id) + ' and status=1'
+            'where  product_type_id=' + str(
+            product_type_id) + ' and status=1 and site_id=0 and district_id=0 and city_id=0 and province_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
     # 10.
     # 油分类
     if (len(pit_oil_platform_price) == 0):
         s = 'select * from pit_oil_platform_price ' \
-            'where  product_category=' + str(product_category) + ' and status=1'
+            'where  product_category=' + str(
+            product_category) + ' and status=1 and site_id=0 and district_id=0 and city_id=0 and province_id=0'
         pit_oil_platform_price = ms.ExecQuery(s)
 
-    platform_discount_list = []
+    platform_discount_list = [0]
     # 有多条适用优惠设置，取最大优惠
     for tmp_price in pit_oil_platform_price:
         if (tmp_price[7] == 1):
@@ -161,10 +165,10 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
         # 验证用户标签
         j = 20
         flag = 0
-        if ( i[20]==0 and i[21]==0 and i[22] ==0):
+        if (i[20] == 0 and i[21] == 0 and i[22] == 0):
             print('no tag limit')
-        elif(tag_ids is None):
-            flag=1
+        elif (tag_ids is None):
+            flag = 1
         else:
             while (j < 23):
                 if (i[j] is not None and i[j] not in tag_ids):
@@ -172,18 +176,18 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
                     continue
                 j += 1
         if (flag == 1): continue
-        #省市区
-        
+        # 省市区
+
         if (i[14] != 0):
             if (str(province_id) != i[14]):
                 continue
             elif (i[15] != '0'):
-                city_id_tmp='"'+str(city_id)+'"'
-                if (i[15].find(city_id_tmp)<0 and i[15].find(str(city_id))<0):
+                city_id_tmp = '"' + str(city_id) + '"'
+                if (i[15].find(city_id_tmp) < 0 and i[15].find(str(city_id)) < 0):
                     continue
-                elif (i[17]!= '0'):
-                    district_id_tmp='"'+str(district_id)+'"'
-                    if (i[17].find(district_id_tmp)<0 and i[17].find(str(district_id))):
+                elif (i[17] != '0'):
+                    district_id_tmp = '"' + str(district_id) + '"'
+                    if (i[17].find(district_id_tmp) < 0 and i[17].find(str(district_id))):
                         continue
         print('省市区满足')
         # 1立减 2折扣(如9.5折)
@@ -197,17 +201,18 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
     return max(tmp_list)
 
 
-def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre,oil_coupon=0):
-    s = 'select * from pit_oil_site_product ' + ' where product_type_id='+ str(product_type_id) +' and site_id='+ str(site_id) + ' and status=1'
+def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre, oil_coupon=0):
+    s = 'select * from pit_oil_site_product ' + ' where product_type_id=' + str(
+        product_type_id) + ' and site_id=' + str(site_id) + ' and status=1'
     print(s)
     list = ms.ExecQuery(s)
     tmp_list = [0]
     for i in list:
         # 能源 - 折扣模式(1百分比2每升减)
         if (i[5] == 1):
-            tmp_list.append(org_amt * (1 - i[6])-oil_coupon)
+            tmp_list.append(org_amt * (1 - i[6]) - oil_coupon)
         else:
-            tmp_list.append(org_amt - org_oil_litre * i[7]-oil_coupon)
+            tmp_list.append(org_amt - org_oil_litre * i[7] - oil_coupon)
     return max(tmp_list)
 
 
@@ -270,6 +275,10 @@ if __name__ == '__main__':
         dic_reduce['platform'] = platform_price(order_id)
         dic_reduce['member'] = member_marketing(province_id, city_id, district_id, tag_ids)
         dic_reduce['plat_site_balance'] = plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre)
+        dic_reduce['plat_income'] = org_amt - dic_reduce['site'] - dic_reduce['platform'] - dic_reduce['member']
+        if (dic_reduce['plat_income'] < 0):
+            dic_reduce['plat_income'] = 0
+        dic_reduce['plat_profit'] = dic_reduce['plat_income'] - dic_reduce['plat_site_balance']
         tmp_list.append(dic_reduce)
     print('---------------------------------------')
     print(tmp_list)
