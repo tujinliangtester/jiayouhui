@@ -112,7 +112,7 @@ def platform_price(order_id):
         pit_oil_platform_price = ms.ExecQuery(s)
 
     platform_discount_list = []
-    # 有多条适用优惠设置，取最大优惠？
+    # 有多条适用优惠设置，取最大优惠
     for tmp_price in pit_oil_platform_price:
         if (tmp_price[7] == 1):
             discount_money = org_price * tmp_price[8] / 100 * org_oil_litre
@@ -157,7 +157,7 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
     list = ms.ExecQuery(s)
     tmp_list = [0]
 
-    # 如果有多个会员活动，取优惠最大？
+    # 如果有多个会员活动，取优惠最大
     for i in list:
         # 验证用户标签
         j = 20
@@ -170,17 +170,17 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
             while (j < 23):
                 if (i[j] is not None and i[j] not in tag_ids):
                     flag = 1
-                    break
+                    continue
                 j += 1
-        if (flag == 1): break
-        # todo
-        if (i[14] != '0'):
-            if (province_id not in i[14]):
+        if (flag == 1): continue
+        #省市区
+        if (i[14] != 0):
+            if (province_id != i[14]):
                 continue
-            elif (i[15] != '0'):
+            elif (i[15] != 0):
                 if (city_id not in i[15]):
                     continue
-                elif (i[17]!= '0'):
+                elif (i[17]!= 0):
                     if (district_id not in i[17]):
                         continue
         # 1立减 2折扣(如9.5折)
@@ -194,17 +194,17 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
     return max(tmp_list)
 
 
-def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre):
-    s = 'select * from pit_oil_site_product ' + ' where product_type_id=' + str(product_type_id) + ' and status=1'
+def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre,oil_coupon=0):
+    s = 'select * from pit_oil_site_product ' + ' where product_type_id='+ str(product_type_id) +' and site_id='+ str(site_id) + ' and status=1'
     print(s)
     list = ms.ExecQuery(s)
     tmp_list = [0]
     for i in list:
         # 能源 - 折扣模式(1百分比2每升减)
         if (i[5] == 1):
-            tmp_list.append(org_amt * (1 - i[6]))
+            tmp_list.append(org_amt * (1 - i[6])-oil_coupon)
         else:
-            tmp_list.append(org_amt - org_oil_litre * i[7])
+            tmp_list.append(org_amt - org_oil_litre * i[7]-oil_coupon)
     return max(tmp_list)
 
 
@@ -243,7 +243,7 @@ if __name__ == '__main__':
     tmp_order1 = com_select('pit_oil_order', 'id')
 
     tmp_list = []
-    for order_id in tmp_order0:
+    for order_id in tmp_order1:
         # order
         org_price = order_detail('org_price')
         org_oil_litre = order_detail('org_oil_litre')
