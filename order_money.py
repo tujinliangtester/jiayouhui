@@ -10,6 +10,39 @@ product_type_id = 0
 org_amt = 0
 create_time = 0
 
+
+
+
+def order_detail(col):
+    s = 'select ' + col + ' from pit_oil_order where id=' + str(order_id)
+    list = ms.ExecQuery(s)
+    return list[0][0]
+
+
+def com_select(table, col):
+    s = 'select top 100 ' + col + ' from ' + table + ' order by id desc'
+    s = 'select top 10 *  from ' + table + ' where id in (' + s + ')' + ' order by id '
+    list = ms.ExecQuery(s)
+    tmp_list = []
+    for i in list:
+        tmp_list.append(i[0])
+    return tmp_list
+
+
+def site_detail(col, site_id):
+    s = 'select ' + col + ' from pit_drp_site where id=' + str(site_id)
+    list = ms.ExecQuery(s)
+    return list[0][0]
+
+
+def user_to_tag(user_id):
+    s = 'select tag_id' + ' from pit_member_user_to_tag where user_id=' + str(user_id)
+    list = ms.ExecQuery(s)
+    if (len(list) == 0):
+        return None
+    return list[0]
+
+
 # 平台优惠
 '''
 平台价格设置表格，油分类-油产品-省市区-油站：获取折扣价格时，条件越具体，优先级越高。
@@ -25,7 +58,6 @@ create_time = 0
    9.油产品
    10.油分类
 '''
-
 
 def platform_price(order_id):
     s = 'select site_id,product_type_id,product_category from pit_oil_order where id=' + str(order_id)
@@ -204,7 +236,6 @@ def member_marketing(province_id, city_id, district_id, tag_ids):
 def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre, oil_coupon=0):
     s = 'select * from pit_oil_site_product ' + ' where product_type_id=' + str(
         product_type_id) + ' and site_id=' + str(site_id) + ' and status=1'
-    print(s)
     list = ms.ExecQuery(s)
     tmp_list = [0]
     for i in list:
@@ -216,38 +247,15 @@ def plat_site_balance(product_type_id, site_id, org_amt, org_oil_litre, oil_coup
     return max(tmp_list)
 
 
-def order_detail(col):
-    s = 'select ' + col + ' from pit_oil_order where id=' + str(order_id)
-    list = ms.ExecQuery(s)
-    return list[0][0]
+
+# def coupon_grant(coupon_id):
 
 
-def com_select(table, col):
-    s = 'select top 100 ' + col + ' from ' + table + ' order by id desc'
-    s = 'select top 10 *  from ' + table + ' where id in (' + s + ')' + ' order by id '
-    list = ms.ExecQuery(s)
-    tmp_list = []
-    for i in list:
-        tmp_list.append(i[0])
-    return tmp_list
 
-
-def site_detail(col, site_id):
-    s = 'select ' + col + ' from pit_drp_site where id=' + str(site_id)
-    list = ms.ExecQuery(s)
-    return list[0][0]
-
-
-def user_to_tag(user_id):
-    s = 'select tag_id' + ' from pit_member_user_to_tag where user_id=' + str(user_id)
-    list = ms.ExecQuery(s)
-    if (len(list) == 0):
-        return None
-    return list[0]
 
 
 if __name__ == '__main__':
-    tmp_order0 = [18822826]
+    tmp_order0 = [18822847]
     tmp_order1 = com_select('pit_oil_order', 'id')
 
     tmp_list = []
