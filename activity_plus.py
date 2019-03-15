@@ -22,7 +22,7 @@ class coupon():
         self.maxm=max
         self.plus=plus
 
-def duce_math(money,price=6,plus_zj_mjzk = True):
+def duce_math(money,price=6.0,plus_zj_mjzk = True):
 
 
     zj1 = zhijiang(1.2)
@@ -43,7 +43,7 @@ def duce_math(money,price=6,plus_zj_mjzk = True):
     coupon3 = coupon(1, discount=0.2, max=50, plus=True)
 
     # 直降
-    duce_zj = money / 6 * zj1.p
+    duce_zj = money / price * zj1.p
 
     # 满减
     if (money >= mj1.m):
@@ -110,9 +110,17 @@ def duce_math(money,price=6,plus_zj_mjzk = True):
 
 
 if __name__=='__main__':
+    '''
+    0   6.53
+    90# 8.49
+    92  6
+    95  7.55
+    98  7.2
+    
+    '''
     money_list=[1,10,20,30,50,100,200,300,400]
     for money in money_list:
-        duce_math(money=money,plus_zj_mjzk=True)
+        duce_math(price=6,money=money,plus_zj_mjzk=True)
 
 
 
